@@ -3,22 +3,20 @@ package main
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
 
 	//connect to local node
-	cl, err := ethclient.Dial("http://127.0.0.1:7545")
+	cl, err := ethclient.Dial("ws://127.0.0.1:9999")
 
 	ctx := context.Background()
 
-	addr := common.HexToAddress("0x60c3A0e473Af1fD6Ab33817d0562e7a67617F5fE")
+	addr := common.HexToAddress("0x0E8340E63fF0BE0528eA1A70E3dedAfF356Fbe44")
 
 	if err != nil {
 		panic(err)
@@ -35,24 +33,42 @@ func main() {
 	// Setup a channel for minted wallets
 	walletsChannel := make(chan *WalletFactoryWalletMinted)
 
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
+	var socketConnected = false
+	for {
 
-	// Start a goroutine which watches new mint events
-	go func() {
+		//connect to socket
+		if socketConnected == false {
+			sub, err := factory.WatchWalletMinted(watchOpts, walletsChannel)
+			if err != nil {
+				panic(err)
 
-		sub, err := factory.WatchWalletMinted(watchOpts, walletsChannel)
-		if err != nil {
-			panic(err)
+			}
+
+			defer sub.Unsubscribe()
+
 		}
-		fmt.Print("listening...")
-		defer sub.Unsubscribe()
+		socketConnected = true
 
-	}()
+		event := <-walletsChannel
+		go addWalletToDb(event)
+
+	}
+
+}
+
+func addWalletToDb(ch *WalletFactoryWalletMinted) {
+
+	event := ch
+
+	fmt.Println("received admin:", event.Admin)
+	fmt.Println("received wallet address:", event.Wallet)
 
 	/*
 
-	   //process events in the channel
+	   handle admin + wallet address
 
 	*/
+	fmt.Print("Finished adding wallet to db ")
 
 }

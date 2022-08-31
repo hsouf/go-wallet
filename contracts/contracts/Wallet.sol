@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract Wallet {
     address private admin;
 
-    event Received(indexed address user, uint256 amount);
+    event Received( address indexed user, uint256 amount);
 
     constructor(address _admin) public payable {
         admin = _admin;
