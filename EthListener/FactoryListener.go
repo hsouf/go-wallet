@@ -62,6 +62,7 @@ func addWalletToDb(ch *WalletFactoryWalletMinted) {
 	event := ch
 
 	fmt.Println("received admin:", event.Admin)
+
 	fmt.Println("received wallet address:", event.Wallet)
 
 	/*

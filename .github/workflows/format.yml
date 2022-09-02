@@ -1,12 +1,24 @@
-name: Golang Formatter
-on: [pull_request]
+name: go-wallet-ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
 jobs:
   build:
-    name: Golang Formatter
+    name: Build go-wallet
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
         with:
-          fetch-depth: 0
-      - name: Golang Formatter
-        uses: sladyn98/auto-go-format@master
+          go-version: "1.19"
+
+      - name: Go fmt
+        run: make gofmt
