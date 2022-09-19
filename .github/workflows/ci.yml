@@ -2,9 +2,9 @@ name: go-wallet-ci
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 jobs:
   build:
@@ -22,6 +22,7 @@ jobs:
 
       - name: Go fmt
         run: make gofmt
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
