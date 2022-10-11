@@ -4,9 +4,10 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Wallet {
+    // To reduce deployment costs this variable is internal and needs to be retrieved via `getStorageAt`
     address private admin;
 
-    event Received( address indexed user, uint256 amount);
+    event EtherDeposited(address indexed user, uint256 amount);
 
     constructor(address _admin) public payable {
         admin = _admin;
@@ -21,13 +22,13 @@ contract Wallet {
         IERC20(_token).transfer(msg.sender, amount);
     }
 
-    function withdraw() public payable {
+    function withdrawEther() public payable {
         require(msg.sender == admin);
         (bool os, ) = payable(admin).call{value: address(this).balance}("");
         require(os);
     }
 
     fallback() external payable {
-        emit Received(msg.sender, msg.value);
+        emit EtherDeposited(msg.sender, msg.value);
     }
 }
