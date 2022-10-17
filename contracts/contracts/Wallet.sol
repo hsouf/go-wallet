@@ -7,7 +7,11 @@ contract Wallet {
     // To reduce deployment costs this variable is internal and needs to be retrieved via `getStorageAt`
     address private admin;
 
-    event EtherDeposited(address indexed user, uint256 amount);
+    event EtherDeposited(
+        address indexed wallet,
+        address depositor,
+        uint256 amount
+    );
 
     constructor(address _admin) public payable {
         admin = _admin;
@@ -29,6 +33,6 @@ contract Wallet {
     }
 
     fallback() external payable {
-        emit EtherDeposited(msg.sender, msg.value);
+        emit EtherDeposited(address(this), msg.sender, msg.value);
     }
 }

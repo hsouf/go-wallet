@@ -31,9 +31,10 @@ func EthListener(walletAddress string) {
 	// Setup a channel for deposited ether
 	depositsChannel := make(chan *wallet.WalletEtherDeposited)
 
-	//temporary
+	//temporary array
 	var wallets []common.Address
 	wallets = make([]common.Address, 1)
+	wallets[0] = addr
 
 	//var wg sync.WaitGroup
 	var socketConnected = false
@@ -46,7 +47,7 @@ func EthListener(walletAddress string) {
 				panic(err)
 
 			}
-			fmt.Println("connection established, listenning for mint events on", walletAddress)
+			fmt.Println("connection established, listenning for ether deposits on", walletAddress)
 			defer sub.Unsubscribe()
 
 		}
@@ -63,7 +64,9 @@ func addTransactionToDb(ch *wallet.WalletEtherDeposited) {
 
 	event := ch
 
-	fmt.Println("deposited", event.Amount)
+	fmt.Println("deposited amount", event.Amount)
+	fmt.Println("depositor:", event.Depositor)
+	fmt.Println("receiver: ", event.Wallet)
 	/*
 	   @TODO: add deposit data to db
 	*/

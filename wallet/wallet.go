@@ -30,7 +30,7 @@ var (
 
 // WalletMetaData contains all meta data concerning the Wallet contract.
 var WalletMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"EtherDeposited\",\"type\":\"event\"},{\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdrawERC20\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawEther\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_admin\",\"type\":\"address\"}],\"stateMutability\":\"payable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"wallet\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"EtherDeposited\",\"type\":\"event\"},{\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdrawERC20\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawEther\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}]",
 }
 
 // WalletABI is the input ABI used to generate the binding from.
@@ -311,39 +311,40 @@ func (it *WalletEtherDepositedIterator) Close() error {
 
 // WalletEtherDeposited represents a EtherDeposited event raised by the Wallet contract.
 type WalletEtherDeposited struct {
-	User   common.Address
-	Amount *big.Int
-	Raw    types.Log // Blockchain specific contextual infos
+	Wallet    common.Address
+	Depositor common.Address
+	Amount    *big.Int
+	Raw       types.Log // Blockchain specific contextual infos
 }
 
-// FilterEtherDeposited is a free log retrieval operation binding the contract event 0x939e51ac2fd009b158d6344f7e68a83d8d18d9b0cc88cf514aac6aaa9cad2a18.
+// FilterEtherDeposited is a free log retrieval operation binding the contract event 0xde0dba27ab2eb9c5e16d9c9c00307ab5d721ab1a7d2510fafa8b34231fcf2f36.
 //
-// Solidity: event EtherDeposited(address indexed user, uint256 amount)
-func (_Wallet *WalletFilterer) FilterEtherDeposited(opts *bind.FilterOpts, user []common.Address) (*WalletEtherDepositedIterator, error) {
+// Solidity: event EtherDeposited(address indexed wallet, address depositor, uint256 amount)
+func (_Wallet *WalletFilterer) FilterEtherDeposited(opts *bind.FilterOpts, wallet []common.Address) (*WalletEtherDepositedIterator, error) {
 
-	var userRule []interface{}
-	for _, userItem := range user {
-		userRule = append(userRule, userItem)
+	var walletRule []interface{}
+	for _, walletItem := range wallet {
+		walletRule = append(walletRule, walletItem)
 	}
 
-	logs, sub, err := _Wallet.contract.FilterLogs(opts, "EtherDeposited", userRule)
+	logs, sub, err := _Wallet.contract.FilterLogs(opts, "EtherDeposited", walletRule)
 	if err != nil {
 		return nil, err
 	}
 	return &WalletEtherDepositedIterator{contract: _Wallet.contract, event: "EtherDeposited", logs: logs, sub: sub}, nil
 }
 
-// WatchEtherDeposited is a free log subscription operation binding the contract event 0x939e51ac2fd009b158d6344f7e68a83d8d18d9b0cc88cf514aac6aaa9cad2a18.
+// WatchEtherDeposited is a free log subscription operation binding the contract event 0xde0dba27ab2eb9c5e16d9c9c00307ab5d721ab1a7d2510fafa8b34231fcf2f36.
 //
-// Solidity: event EtherDeposited(address indexed user, uint256 amount)
-func (_Wallet *WalletFilterer) WatchEtherDeposited(opts *bind.WatchOpts, sink chan<- *WalletEtherDeposited, user []common.Address) (event.Subscription, error) {
+// Solidity: event EtherDeposited(address indexed wallet, address depositor, uint256 amount)
+func (_Wallet *WalletFilterer) WatchEtherDeposited(opts *bind.WatchOpts, sink chan<- *WalletEtherDeposited, wallet []common.Address) (event.Subscription, error) {
 
-	var userRule []interface{}
-	for _, userItem := range user {
-		userRule = append(userRule, userItem)
+	var walletRule []interface{}
+	for _, walletItem := range wallet {
+		walletRule = append(walletRule, walletItem)
 	}
 
-	logs, sub, err := _Wallet.contract.WatchLogs(opts, "EtherDeposited", userRule)
+	logs, sub, err := _Wallet.contract.WatchLogs(opts, "EtherDeposited", walletRule)
 	if err != nil {
 		return nil, err
 	}
@@ -375,9 +376,9 @@ func (_Wallet *WalletFilterer) WatchEtherDeposited(opts *bind.WatchOpts, sink ch
 	}), nil
 }
 
-// ParseEtherDeposited is a log parse operation binding the contract event 0x939e51ac2fd009b158d6344f7e68a83d8d18d9b0cc88cf514aac6aaa9cad2a18.
+// ParseEtherDeposited is a log parse operation binding the contract event 0xde0dba27ab2eb9c5e16d9c9c00307ab5d721ab1a7d2510fafa8b34231fcf2f36.
 //
-// Solidity: event EtherDeposited(address indexed user, uint256 amount)
+// Solidity: event EtherDeposited(address indexed wallet, address depositor, uint256 amount)
 func (_Wallet *WalletFilterer) ParseEtherDeposited(log types.Log) (*WalletEtherDeposited, error) {
 	event := new(WalletEtherDeposited)
 	if err := _Wallet.contract.UnpackLog(event, "EtherDeposited", log); err != nil {
