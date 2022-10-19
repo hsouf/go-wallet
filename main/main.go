@@ -14,5 +14,6 @@ func main() {
 	fmt.Println(wallets["soufiane"])
 
 	listeners.FactoryListener("0xBb7Db47A8bE34246B6F29078C99523fd910533EB")
+	listeners.EthListener("0xBb7Db47A8bE34246B6F29078C99523fd910533EB")
 
 }
