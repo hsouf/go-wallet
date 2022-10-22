@@ -11,7 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func FactoryListener(factoryAddress string) {
+func FactoryListener(factoryAddress string, endpoint string) {
 
 	//connect to local node
 	cl, err := ethclient.Dial("ws://127.0.0.1:9999")

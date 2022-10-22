@@ -10,20 +10,18 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func EthListener(walletAddress string) {
+func EthListener(walletAddress common.Address, endpoint string) {
 
 	//connect to local node
-	cl, err := ethclient.Dial("ws://127.0.0.1:9999")
+	cl, err := ethclient.Dial(endpoint)
 
 	ctx := context.Background()
-
-	addr := common.HexToAddress(walletAddress)
 
 	if err != nil {
 		panic(err)
 	}
 
-	factory, err := wallet.NewWallet(addr, cl)
+	factory, err := wallet.NewWallet(walletAddress, cl)
 
 	// Watch for a minted wallets events on Factory
 	watchOpts := &bind.WatchOpts{Context: ctx, Start: nil}
@@ -32,9 +30,9 @@ func EthListener(walletAddress string) {
 	depositsChannel := make(chan *wallet.WalletEtherDeposited)
 
 	//temporary array
-	var wallets []common.Address
-	wallets = make([]common.Address, 1)
-	wallets[0] = addr
+	var wallet []common.Address
+	wallet = make([]common.Address, 1)
+	wallet[0] = walletAddress
 
 	//var wg sync.WaitGroup
 	var socketConnected = false
@@ -42,12 +40,11 @@ func EthListener(walletAddress string) {
 
 		//connect to socket
 		if socketConnected == false {
-			sub, err := factory.WatchEtherDeposited(watchOpts, depositsChannel, wallets)
+			sub, err := factory.WatchEtherDeposited(watchOpts, depositsChannel, wallet)
 			if err != nil {
 				panic(err)
 
 			}
-			fmt.Println("connection established, listenning for ether deposits on", walletAddress)
 
 			defer func() {
 				sub.Unsubscribe()

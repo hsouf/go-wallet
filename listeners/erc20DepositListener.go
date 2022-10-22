@@ -10,14 +10,13 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func ERC20Listener(walletAddress string) {
+func ERC20Listener(wallets []common.Address, erc20Token string, endpoint string) {
 
-	//connect to local node
-	cl, err := ethclient.Dial("ws://127.0.0.1:9999")
+	cl, err := ethclient.Dial(endpoint)
 
 	ctx := context.Background()
 
-	addr := common.HexToAddress(walletAddress)
+	addr := common.HexToAddress(erc20Token)
 
 	if err != nil {
 		panic(err)
@@ -25,7 +24,6 @@ func ERC20Listener(walletAddress string) {
 
 	factory, err := erc20.NewErc20(addr, cl)
 
-	// Watch for a minted wallets events on Factory
 	watchOpts := &bind.WatchOpts{Context: ctx, Start: nil}
 
 	// Setup a channel for deposited ether
@@ -33,10 +31,7 @@ func ERC20Listener(walletAddress string) {
 
 	//temporary array
 	var from []common.Address
-	from = make([]common.Address, 1)
-
-	var to []common.Address
-	to = make([]common.Address, 1)
+	from = make([]common.Address, 0)
 
 	//var wg sync.WaitGroup
 	var socketConnected = false
@@ -44,12 +39,12 @@ func ERC20Listener(walletAddress string) {
 
 		//connect to socket
 		if socketConnected == false {
-			sub, err := factory.WatchTransfer(watchOpts, depositsChannel, from, to)
+			sub, err := factory.WatchTransfer(watchOpts, depositsChannel, from, wallets)
 			if err != nil {
 				panic(err)
 
 			}
-			fmt.Println("connection established, listenning for ether deposits on", walletAddress)
+			fmt.Println("connection established, listenning for ether deposits on", erc20Token)
 
 			defer func() {
 				sub.Unsubscribe()
