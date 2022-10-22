@@ -47,7 +47,11 @@ func FactoryListener(factoryAddress string) {
 
 			}
 			fmt.Println("connection established, listenning for mint events on", factoryAddress)
-			defer sub.Unsubscribe()
+			defer func() {
+				sub.Unsubscribe()
+				socketConnected = false
+
+			}()
 
 		}
 		socketConnected = true

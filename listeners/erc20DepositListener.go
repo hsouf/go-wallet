@@ -3,14 +3,14 @@ package listeners
 import (
 	"context"
 	"fmt"
-	"main/wallet"
+	"main/erc20"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func EthListener(walletAddress string) {
+func ERC20Listener(walletAddress string) {
 
 	//connect to local node
 	cl, err := ethclient.Dial("ws://127.0.0.1:9999")
@@ -23,18 +23,20 @@ func EthListener(walletAddress string) {
 		panic(err)
 	}
 
-	factory, err := wallet.NewWallet(addr, cl)
+	factory, err := erc20.NewErc20(addr, cl)
 
 	// Watch for a minted wallets events on Factory
 	watchOpts := &bind.WatchOpts{Context: ctx, Start: nil}
 
 	// Setup a channel for deposited ether
-	depositsChannel := make(chan *wallet.WalletEtherDeposited)
+	depositsChannel := make(chan *erc20.Erc20Transfer)
 
 	//temporary array
-	var wallets []common.Address
-	wallets = make([]common.Address, 1)
-	wallets[0] = addr
+	var from []common.Address
+	from = make([]common.Address, 1)
+
+	var to []common.Address
+	to = make([]common.Address, 1)
 
 	//var wg sync.WaitGroup
 	var socketConnected = false
@@ -42,7 +44,7 @@ func EthListener(walletAddress string) {
 
 		//connect to socket
 		if socketConnected == false {
-			sub, err := factory.WatchEtherDeposited(watchOpts, depositsChannel, wallets)
+			sub, err := factory.WatchTransfer(watchOpts, depositsChannel, from, to)
 			if err != nil {
 				panic(err)
 
@@ -59,19 +61,19 @@ func EthListener(walletAddress string) {
 		socketConnected = true
 
 		event := <-depositsChannel
-		go addEthDepositToDb(event)
+		go addErc20TransferToDb(event)
 
 	}
 
 }
 
-func addEthDepositToDb(ch *wallet.WalletEtherDeposited) {
+func addErc20TransferToDb(ch *erc20.Erc20Transfer) {
 
 	event := ch
 
-	fmt.Println("deposited amount", event.Amount)
-	fmt.Println("depositor:", event.Depositor)
-	fmt.Println("receiver: ", event.Wallet)
+	fmt.Println("deposited amount", event.Value)
+	fmt.Println("depositor:", event.From)
+	fmt.Println("receiver: ", event.To)
 	/*
 	   @TODO: add deposit data to db
 	*/
