@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	ethEndpoint := ""
+	ethEndpoint := "ws://127.0.0.1:9999"
 	erc20Token := ""
 
 	//temp array, all wallets to listen to should be fetched every 10minutes from DB

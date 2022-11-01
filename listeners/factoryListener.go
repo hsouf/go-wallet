@@ -4,18 +4,19 @@ import (
 	"context"
 	"fmt"
 
+	"main/walletFactory"
+	"time"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/event"
 	log "github.com/sirupsen/logrus"
-	"main/walletFactory"
-	"time"
 )
 
 func FactoryListener(factoryAddress string, endpoint string) { //connect to local node
 
-	cl, err := ethclient.Dial("ws://127.0.0.1:9999")
+	cl, err := ethclient.Dial(endpoint)
 
 	ctx := context.Background()
 
@@ -53,17 +54,33 @@ func FactoryListener(factoryAddress string, endpoint string) { //connect to loca
 		sub.Unsubscribe()
 
 	}()
+
 	for {
 		select {
+
 		case <-sub.Err():
 
-			log.WithFields(log.Fields{
-				"timestamp": time.Now(),
-				"websocket": endpoint,
-			}).Warn("Socket disconnected, trying to reconnect...")
-
 			sub = event.Resubscribe(backoffMax, func(ctx context.Context) (event.Subscription, error) {
-				return factory.WatchWalletMinted(watchOpts, walletsChannel)
+				subscription, err := factory.WatchWalletMinted(watchOpts, walletsChannel)
+
+				if subscription != nil {
+					log.WithFields(log.Fields{
+						"socket": endpoint,
+						"timestamp": time.Now(),
+					}).Warn("Socket reconnected!")
+
+				} else {
+
+					log.WithFields(log.Fields{
+						"timestamp": time.Now(),
+						"socket": endpoint,
+					}).Warn("Socket disconnected, trying to reconnect...")
+					//log reconnect message each 100 ms
+					time.Sleep(backoffMax)
+
+				}
+
+				return subscription, err
 			})
 
 		case event := <-walletsChannel:
