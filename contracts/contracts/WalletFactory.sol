@@ -9,7 +9,15 @@ contract WalletFactory {
 
     event WalletMinted(address wallet, address admin);
 
-    function setAdmin(address _factoryGov) public {
+    modifier onlyGov() {
+        require(
+            msg.sender == factoryGov,
+            "This function is restricted to the factory governance"
+        );
+        _;
+    }
+
+    function setAdmin(address _factoryGov) public onlyGov {
         factoryGov = _factoryGov;
     }
 
@@ -22,8 +30,7 @@ contract WalletFactory {
         return address(newWallet);
     }
 
-    function withdraw() public payable {
-        require(msg.sender == factoryGov);
+    function withdraw() public payable onlyGov {
         (bool os, ) = payable(factoryGov).call{value: address(this).balance}(
             ""
         );
