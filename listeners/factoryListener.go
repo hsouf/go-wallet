@@ -65,14 +65,15 @@ func FactoryListener(factoryAddress string, endpoint string) { //connect to loca
 
 				if subscription != nil {
 					log.WithFields(log.Fields{
-						"socket": endpoint,
+						"socket":    endpoint,
 						"timestamp": time.Now(),
+						"listener":  "Factory",
 					}).Warn("Socket reconnected!")
 
 				} else {
 
 					log.WithFields(log.Fields{
-						"timestamp": time.Now(),
+						"timestam   p": time.Now(),
 						"socket": endpoint,
 					}).Warn("Socket disconnected, trying to reconnect...")
 					//log reconnect message each 100 ms
